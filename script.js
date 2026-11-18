@@ -2,7 +2,7 @@ const main = document.querySelector('main');
 let boardRows = 20;
 let boardColumns = 20;
 const SNAKE_LEN = 3;
-let snake = [];
+const snake = [];
 let usrInput = "";
 
 let FPS = 5;
@@ -10,6 +10,7 @@ let FRAME_DURATION = 1000 / FPS ;
 let isRunning = false;
 let towards 
 const possibleTowards = new Set(["left","right","up","down"])
+
 
 const isUsrInputValid = (input) => {
   if ((!possibleTowards.has(input)) || (towards == "left" && input == "right") || (towards == "right" && input == "left") || (towards == "up" && input == "down") || (towards == "down" && input == "up")) {
@@ -61,7 +62,7 @@ const applySnakeClass = () => {
 }
 
 const generateSnakeAndDirection = () => {
-  const minRow = minColumn = SNAKE_LEN;
+  const minRow = SNAKE_LEN, minColumn = SNAKE_LEN;
   const maxRow = boardRows - SNAKE_LEN + 1;
   const maxColumn = boardColumns - SNAKE_LEN + 1;
 
@@ -76,7 +77,6 @@ const generateSnakeAndDirection = () => {
   towards = Math.random() < 0.5
     ? (startColumn < boardColumns / 2 ? "right" : "left")
     : (startRow < boardRows / 2 ? "down" : "up")
-
   //creating tails position
   for (let i = 1; i < SNAKE_LEN; i++) {
     if (towards == "right") {
@@ -88,7 +88,7 @@ const generateSnakeAndDirection = () => {
     } else if (towards == "down") {
       snake.push([startRow+i, startColumn])
     }
-    console.log(snake)
+    
   }
 }
 
@@ -105,38 +105,39 @@ const generateSnakeAndDirection = () => {
 //   return currentPostition
 // 
 
-const getNextHead = (currentHeadPosition) => {
-  let nextHeadPostion = currentHeadPosition;
-  if      ( towards == "right") {nextHeadPostion[1] += 1}
-  else if ( towards == "left" ) {nextHeadPostion[1] -= 1}
-  else if ( towards == "up"  )  {nextHeadPostion[0] += 1}
-  else if ( towards == "down" ) {nextHeadPostion[0] -= 1}
-  console.log("Next Head Position", nextHeadPostion)
-  return nextHeadPostion;
- 
+const getNextHead = (arr) => {
+  if      ( towards == "right") {arr[1] += 1}
+  else if ( towards == "left" ) {arr[1] -= 1}
+  else if ( towards == "up"  )  {arr[0] -= 1}
+  else if ( towards == "down" ) {arr[0] += 1}
+  return arr;
 }
 
 const unShiftSnakeNext = () => {
-  console.log("Before Unshift: ", snake)
-  const nextHeadPosition = getNextHead(snake[0])
+  console.log("BEFORE UNSHIFT: ", JSON.stringify(snake), towards)
 
+  const nextHeadPosition = getNextHead([...snake[0]])
+  console.log(nextHeadPosition)
   if (nextHeadPosition[0] < 1 || nextHeadPosition[0] > boardRows || nextHeadPosition[1] < 1 || nextHeadPosition[1] > boardColumns) {
     isRunning = false;
     return;
   }
+ console.log("BEW", JSON.stringify(snake))
   snake.unshift(nextHeadPosition);
-  console.log("After Unshift: ", snake)
+  console.log("AFTER UNSHIFT: ", JSON.stringify(snake))
 }
 
 const init = () => {
+  console.log("Before Init: ", JSON.stringify(snake))
   createGrid();
+  console.log("After Createa Grid: ", JSON.stringify(snake))
   generateSnakeAndDirection();
-  console.log(towards)
-  console.log("Initial Snake", snake)
-  // applySnakeClass();
+
+  applySnakeClass();
 }
 
 const gameLoop = () => {
+  console.log("Start the loop",JSON.stringify(snake))
   // Upldate
   
   // // (1) Move head towards the direction
@@ -146,12 +147,10 @@ const gameLoop = () => {
   // // Draw - apply class
   applySnakeClass()
   snake.pop()
-  console.log(snake)
   
   // Schedule the next frame
   setTimeout(gameLoop, FRAME_DURATION);
 }
-
 
 
 
