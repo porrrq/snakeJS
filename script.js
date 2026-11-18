@@ -22,7 +22,6 @@ const isUsrInputValid = (input) => {
 
 document.addEventListener("keydown", (event) => {
   usrInput = event.key.slice(5).toLowerCase()
-  towards = isUsrInputValid(usrInput) ? usrInput : towards;
 })
 
 
@@ -139,7 +138,8 @@ const init = () => {
 const gameLoop = () => {
   console.log("Start the loop",JSON.stringify(snake))
   // Upldate
-  
+  towards = isUsrInputValid(usrInput) ? usrInput : towards;
+
   // // (1) Move head towards the direction
   unShiftSnakeNext();
   if (!isRunning) return
