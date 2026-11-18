@@ -1,11 +1,11 @@
 const main = document.querySelector('main');
-let boardRows = 20;
-let boardColumns = 20;
-const SNAKE_LEN = 3;
+let boardRows = 30;
+let boardColumns = 30;
+const SNAKE_LEN = 10;
 const snake = [];
 let usrInput = "";
 
-let FPS = 5;
+let FPS = 20;
 let FRAME_DURATION = 1000 / FPS ;
 let isRunning = false;
 let towards 
@@ -83,26 +83,14 @@ const generateSnakeAndDirection = () => {
     } else if (towards == "left") {
       snake.push([startRow, startColumn+i])
     } else if (towards == "up") {
-      snake.push([startRow-i, startColumn])
-    } else if (towards == "down") {
       snake.push([startRow+i, startColumn])
-    }
-    
+    } else if (towards == "down") {
+      snake.push([startRow-i, startColumn])
+    } 
   }
+  console.log(towards)
 }
 
-// const changePosition = (currentPostition, direction) => {
-//   if      ( direction == "right") {currentPostition[1] += 1}
-//   else if ( direction == "left" ) {currentPostition[1] -= 1}
-//   else if ( direction == "top"  ) {currentPostition[0] += 1}
-//   else if ( direction == "down" ) {currentPostition[0] -= 1}
-//   else {
-//     console.error("direction is not correct")
-//     currentPostition[0] += 1
-//   }
-//   console.log(currentPostition)
-//   return currentPostition
-// 
 
 const getNextHead = (arr) => {
   if      ( towards == "right") {arr[1] += 1}
@@ -113,25 +101,23 @@ const getNextHead = (arr) => {
 }
 
 const unShiftSnakeNext = () => {
-  console.log("BEFORE UNSHIFT: ", JSON.stringify(snake), towards)
-
   const nextHeadPosition = getNextHead([...snake[0]])
+  const alreadyHas = snake.some(position => JSON.stringify(position) === JSON.stringify(nextHeadPosition))
   console.log(nextHeadPosition)
-  if (nextHeadPosition[0] < 1 || nextHeadPosition[0] > boardRows || nextHeadPosition[1] < 1 || nextHeadPosition[1] > boardColumns) {
+  console.log(alreadyHas)
+  if (nextHeadPosition[0] < 1 || nextHeadPosition[0] > boardRows || nextHeadPosition[1] < 1 || nextHeadPosition[1] > boardColumns || alreadyHas) {
     isRunning = false;
     return;
   }
- console.log("BEW", JSON.stringify(snake))
+
   snake.unshift(nextHeadPosition);
-  console.log("AFTER UNSHIFT: ", JSON.stringify(snake))
+  const hasDuplicates = new Set(snake).size !== snake.length;
+  console.log(hasDuplicates)
 }
 
 const init = () => {
-  console.log("Before Init: ", JSON.stringify(snake))
   createGrid();
-  console.log("After Createa Grid: ", JSON.stringify(snake))
   generateSnakeAndDirection();
-
   applySnakeClass();
 }
 
@@ -139,11 +125,18 @@ const gameLoop = () => {
   console.log("Start the loop",JSON.stringify(snake))
   // Upldate
   towards = isUsrInputValid(usrInput) ? usrInput : towards;
+  console.log(towards)
 
   // // (1) Move head towards the direction
   unShiftSnakeNext();
-  if (!isRunning) return
-
+  if (!isRunning) {
+    snake.map((position, index) => {
+    const cell = document.querySelector(`main > div:nth-child(${position[0]}) > div:nth-child(${position[1]})`)
+    cell.classList.toggle("dead")
+  })
+    return
+    
+  }
   // // Draw - apply class
   applySnakeClass()
   snake.pop()

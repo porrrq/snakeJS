@@ -16,19 +16,22 @@ main {
 }
 
 .cell-default {
-  background-color: DarkSlateGray;
+  background-color: white;
 }
 
 .cell-invert {
-  background-color: black;
+  background-color: greenyellow;
 }
 
 .snake {
-  background-color: cyan;
+  background-color: black;
 }
 .snakeHead {
-  background-color: violet !important;
+  background-color: black !important;
 }
 .apple {
+  background-color: red;
+}
+.dead {
   background-color: red;
 }
