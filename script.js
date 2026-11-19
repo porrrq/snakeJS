@@ -1,15 +1,26 @@
 const main = document.querySelector('main');
-let boardRows = 30;
-let boardColumns = 30;
-const SNAKE_LEN = 10;
-const snake = [];
+let boardRows = 4;
+let boardColumns = 4;
+const SNAKE_LEN = 1;
+let snake = [];
+let appleDiv;
 let usrInput = "";
+let didAppleEaten = false;
 
-let FPS = 20;
+let FPS = 1;
 let FRAME_DURATION = 1000 / FPS ;
 let isRunning = false;
 let towards 
 const possibleTowards = new Set(["left","right","up","down"])
+
+const clearValue = () => {
+  snake = [];
+  appleDiv = null;
+  usrInput = ""
+  didAppleEaten = false;
+  isRunning = false;
+  towards = ""
+}
 
 
 const isUsrInputValid = (input) => {
@@ -21,6 +32,12 @@ const isUsrInputValid = (input) => {
 }
 
 document.addEventListener("keydown", (event) => {
+  console.log(event.key)
+  if (event.key == "Enter" && !isRunning) {
+    isRunning = true;
+    document.querySelector('.start-overlay').style.display = "none";
+    runGame()
+  }
   usrInput = event.key.slice(5).toLowerCase()
 })
 
@@ -51,7 +68,10 @@ const applySnakeClass = () => {
     if (index == 0) {
       cell.classList.add('snake','snakeHead');
     } else if ((index == snake.length-1) && isRunning) {
-      cell.classList.remove('snake');
+      if (!didAppleEaten) {
+        cell.classList.remove('snake');
+        snake.pop()
+      }
     }
     else {
       cell.classList.add('snake');
@@ -88,7 +108,6 @@ const generateSnakeAndDirection = () => {
       snake.push([startRow-i, startColumn])
     } 
   }
-  console.log(towards)
 }
 
 
@@ -102,55 +121,79 @@ const getNextHead = (arr) => {
 
 const unShiftSnakeNext = () => {
   const nextHeadPosition = getNextHead([...snake[0]])
-  const alreadyHas = snake.some(position => JSON.stringify(position) === JSON.stringify(nextHeadPosition))
-  console.log(nextHeadPosition)
-  console.log(alreadyHas)
-  if (nextHeadPosition[0] < 1 || nextHeadPosition[0] > boardRows || nextHeadPosition[1] < 1 || nextHeadPosition[1] > boardColumns || alreadyHas) {
+  const gonnaHitItself = snake.some(position => JSON.stringify(position) === JSON.stringify(nextHeadPosition))
+  if (nextHeadPosition[0] < 1 || nextHeadPosition[0] > boardRows || nextHeadPosition[1] < 1 || nextHeadPosition[1] > boardColumns || gonnaHitItself) {
     isRunning = false;
     return;
   }
-
   snake.unshift(nextHeadPosition);
-  const hasDuplicates = new Set(snake).size !== snake.length;
-  console.log(hasDuplicates)
 }
+
+
+const generateApplePosition = () => {
+  // Select all cell that isn't a snake
+  const nonSnake = document.querySelectorAll(".column:not(.snake)")
+  const appleDivIndex = randomNumIncludeMinMax(0,nonSnake.length-1)
+  appleDiv = nonSnake[appleDivIndex]
+  appleDiv.classList.add("apple");
+}
+
+const isNextIsApple = () => {
+  const appleDiv = document.querySelector(".apple");
+  const nextHeadDiv = document.querySelector(`main > div:nth-child(${snake[0][0]}) > div:nth-child(${snake[0][1]})`);
+  didAppleEaten = appleDiv.isSameNode(nextHeadDiv)
+}
+
 
 const init = () => {
   createGrid();
   generateSnakeAndDirection();
+  generateApplePosition();
   applySnakeClass();
 }
 
 const gameLoop = () => {
-  console.log("Start the loop",JSON.stringify(snake))
   // Upldate
   towards = isUsrInputValid(usrInput) ? usrInput : towards;
-  console.log(towards)
 
   // // (1) Move head towards the direction
   unShiftSnakeNext();
   if (!isRunning) {
-    snake.map((position, index) => {
-    const cell = document.querySelector(`main > div:nth-child(${position[0]}) > div:nth-child(${position[1]})`)
-    cell.classList.toggle("dead")
-  })
-    return
-    
+    document.querySelector('.start-overlay').style.display = "flex";
+    if (SNAKE_LEN != boardColumns * boardRows) {
+        snake.map((position, index) => {
+        const cell = document.querySelector(`main > div:nth-child(${position[0]}) > div:nth-child(${position[1]})`)
+        cell.classList.toggle("dead")
+        document.querySelector(".game-name").innerText = "You Died"
+        document.querySelector(".instruction").innerHTML = "Press <em>Enter</em> to try again!"
+      })} else {
+        document.querySelector(".game-name").innerText = "You win!"
+        document.querySelector(".instruction").innerHTML = "Press <em>Enter</em> to play again!"
+    }
+    clearValue();
+    return  
   }
+  isNextIsApple();
+  if (didAppleEaten) {
+    // Clear Apple
+    appleDiv.classList.remove("apple")
+    generateApplePosition()
+  }
+  
   // // Draw - apply class
   applySnakeClass()
-  snake.pop()
   
   // Schedule the next frame
   setTimeout(gameLoop, FRAME_DURATION);
 }
 
 
+// START //
 
-
-init();
-isRunning = true;
-gameLoop();
+const runGame = () => {
+  init();
+  gameLoop();
+}
 
 
 

@@ -1,9 +1,38 @@
+body {
+  background-color: black;
+}
 main {
   width: min(95vh, 95vw);
   aspect-ratio: 1 / 1;
   background-color: black;
   margin: auto;
-  padding: min(1vh, 1vw);
+  border: 4px solid white;
+  background-color: black;
+}
+
+.start-overlay {
+  background-color: black;
+  position: fixed;
+  opacity: 0.7;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  top: 0;
+  left: 0;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  color: white;
+  font-family: sans-serif;
+}
+.game-name {
+  font-size: 10em;
+  margin: 0;
+}
+.start-overlay * {
+  z-index: -1;
 }
 
 .row {
@@ -16,22 +45,22 @@ main {
 }
 
 .cell-default {
-  background-color: white;
+  background-color: #181818;
 }
 
 .cell-invert {
-  background-color: greenyellow;
+  background-color: #181818;
 }
 
 .snake {
-  background-color: black;
+  background-color: #e4e4ef;
 }
 .snakeHead {
-  background-color: black !important;
+  background-color: #e4e4ef;
 }
 .apple {
   background-color: red;
 }
 .dead {
-  background-color: red;
+  background-color: #c73c3f;
 }
